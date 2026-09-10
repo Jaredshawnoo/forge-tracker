@@ -1,0 +1,15 @@
+{
+  "name": "Forge — Workout & Diet Tracker",
+  "short_name": "Forge",
+  "description": "Track workouts, calories, and macros — fast, offline, and private.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0f14",
+  "theme_color": "#0d0f14",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
