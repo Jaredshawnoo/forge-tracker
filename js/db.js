@@ -53,7 +53,37 @@ const DB = {
     if (!this.data.routines) this.data.routines = [];
     if (!this.data.weightLogs) this.data.weightLogs = [];
     if (!this.data.waterLogs) this.data.waterLogs = [];
+    this.syncDefaults();
     return this.data;
+  },
+  syncDefaults() {
+    const byName = name => this.data.exercises.find(e => e.name === name);
+    let changed = false;
+
+    DEFAULT_EXERCISES.forEach(def => {
+      if (!byName(def.name)) { this.data.exercises.push({ id: uid(), custom: false, ...def }); changed = true; }
+    });
+
+    this.data.routines.forEach(r => {
+      if (r.exerciseIds && !r.exercises) {
+        r.exercises = r.exerciseIds.map(id => ({ exerciseId: id, sets: 3, reps: '' }));
+        delete r.exerciseIds;
+        changed = true;
+      }
+      if (!r.exercises) r.exercises = [];
+    });
+
+    DEFAULT_ROUTINES.forEach(def => {
+      if (this.data.routines.some(r => r.name === def.name)) return;
+      const exercises = def.exercises
+        .map(e => { const ex = byName(e.name); return ex ? { exerciseId: ex.id, sets: e.sets, reps: e.reps } : null; })
+        .filter(Boolean);
+      if (exercises.length) {
+        this.data.routines.push({ id: uid(), name: def.name, exercises });
+        changed = true;
+      }
+    });
+    if (changed) this.save();
   },
   save() {
     localStorage.setItem(DB_KEY, JSON.stringify(this.data));

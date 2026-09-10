@@ -39,7 +39,21 @@ const DEFAULT_EXERCISES = [
   { name: 'Cycling', category: 'Cardio' },
   { name: 'Rowing Machine', category: 'Cardio' },
   { name: 'Jump Rope', category: 'Cardio' },
-  { name: 'Stair Climber', category: 'Cardio' }
+  { name: 'Stair Climber', category: 'Cardio' },
+  { name: 'Close-Grip Barbell Bench Press', category: 'Arms' },
+  { name: 'Barbell Upright Row', category: 'Shoulders' },
+  { name: 'Fixed Barbell Curl', category: 'Arms' },
+  { name: 'Barbell Shrug', category: 'Back' },
+  { name: 'Barbell Floor Press', category: 'Chest' },
+  { name: 'Seated Barbell Press (Light)', category: 'Shoulders' },
+  { name: 'Wide-Grip Bench Press', category: 'Chest' },
+  { name: 'Fixed Barbell Overhead Tricep Extension', category: 'Arms' },
+  { name: 'Pendlay Row', category: 'Back' },
+  { name: 'Underhand-Grip Barbell Row (Yates Row)', category: 'Back' },
+  { name: 'Fixed Barbell 21s', category: 'Arms' },
+  { name: 'Barbell Rear Delt Row', category: 'Shoulders' },
+  { name: 'Barbell Good Morning', category: 'Legs' },
+  { name: 'Barbell Lunge', category: 'Legs' }
 ];
 
 const DEFAULT_FOODS = [
@@ -73,4 +87,60 @@ const DEFAULT_FOODS = [
   { name: 'Whole Milk', serving: '250 ml', calories: 150, protein: 8, carbs: 12, fat: 8 },
   { name: 'Almond Milk, unsweetened', serving: '250 ml', calories: 30, protein: 1, carbs: 1, fat: 2.5 },
   { name: 'Cheddar Cheese', serving: '28 g', calories: 113, protein: 7, carbs: 0.4, fat: 9 }
+];
+
+const DEFAULT_ROUTINES = [
+  {
+    name: 'Push A (Heavy Focus)',
+    exercises: [
+      { name: 'Barbell Bench Press', sets: 3, reps: '5-7' },
+      { name: 'Overhead Press', sets: 3, reps: '6-8' },
+      { name: 'Close-Grip Barbell Bench Press', sets: 3, reps: '8-10' },
+      { name: 'Barbell Upright Row', sets: 3, reps: '10-12' }
+    ]
+  },
+  {
+    name: 'Pull A (Heavy Focus)',
+    exercises: [
+      { name: 'Deadlift', sets: 3, reps: '5' },
+      { name: 'Barbell Row', sets: 3, reps: '6-8' },
+      { name: 'Fixed Barbell Curl', sets: 3, reps: '8-10' },
+      { name: 'Barbell Shrug', sets: 3, reps: '10-12' }
+    ]
+  },
+  {
+    name: 'Legs A (Heavy Focus)',
+    exercises: [
+      { name: 'Barbell Squat', sets: 3, reps: '5-7' },
+      { name: 'Romanian Deadlift', sets: 3, reps: '8-10' },
+      { name: 'Calf Raise', sets: 3, reps: '10-12' }
+    ]
+  },
+  {
+    name: 'Push B (Volume & Variation)',
+    exercises: [
+      { name: 'Barbell Floor Press', sets: 3, reps: '8-10' },
+      { name: 'Seated Barbell Press (Light)', sets: 3, reps: '8-10' },
+      { name: 'Wide-Grip Bench Press', sets: 3, reps: '8-10' },
+      { name: 'Fixed Barbell Overhead Tricep Extension', sets: 3, reps: '10-12' }
+    ]
+  },
+  {
+    name: 'Pull B (Volume & Variation)',
+    exercises: [
+      { name: 'Pendlay Row', sets: 3, reps: '6-8' },
+      { name: 'Underhand-Grip Barbell Row (Yates Row)', sets: 3, reps: '8-10' },
+      { name: 'Fixed Barbell 21s', sets: 3, reps: '10-12' },
+      { name: 'Barbell Rear Delt Row', sets: 3, reps: '10-12' }
+    ]
+  },
+  {
+    name: 'Legs B (Volume & Variation)',
+    exercises: [
+      { name: 'Front Squat', sets: 3, reps: '6-8' },
+      { name: 'Barbell Good Morning', sets: 3, reps: '10-12' },
+      { name: 'Barbell Lunge', sets: 3, reps: '8-10/leg' },
+      { name: 'Calf Raise', sets: 3, reps: '12-15' }
+    ]
+  }
 ];

@@ -51,7 +51,7 @@ function renderTodayWorkout() {
           <div class="list-item">
             <div class="list-item-main">
               <div class="list-item-title">${escapeHtml(r.name)}</div>
-              <div class="list-item-sub">${r.exerciseIds.length} exercise${r.exerciseIds.length === 1 ? '' : 's'}</div>
+              <div class="list-item-sub">${r.exercises.length} exercise${r.exercises.length === 1 ? '' : 's'}</div>
             </div>
             <button class="btn btn-sm btn-primary" onclick="startWorkout('${r.id}')">Start</button>
           </div>
@@ -75,9 +75,15 @@ function renderTodayWorkout() {
 
 function startWorkout(routineId) {
   const routine = routineId ? DB.data.routines.find(r => r.id === routineId) : null;
-  const exercises = (routine ? routine.exerciseIds : []).map(exId => {
-    const ex = DB.data.exercises.find(e => e.id === exId);
-    return { exerciseId: exId, name: ex ? ex.name : 'Exercise', sets: [{ reps: '', weight: '', completed: false }] };
+  const exercises = (routine ? routine.exercises : []).map(item => {
+    const ex = DB.data.exercises.find(e => e.id === item.exerciseId);
+    const setCount = item.sets || 1;
+    return {
+      exerciseId: item.exerciseId,
+      name: ex ? ex.name : 'Exercise',
+      targetReps: item.reps || '',
+      sets: Array.from({ length: setCount }, () => ({ reps: '', weight: '', completed: false }))
+    };
   });
   DB.data.activeWorkout = {
     id: uid(),
@@ -120,6 +126,8 @@ function renderActiveWorkout() {
 
 function renderExerciseCard(ex, exIdx) {
   const prev = lastPerformanceText(ex.exerciseId);
+  const libEx = DB.data.exercises.find(e => e.id === ex.exerciseId);
+  const isCardio = libEx && libEx.category === 'Cardio';
   return `
     <div class="card exercise-card">
       <div class="exercise-card-head">
@@ -128,9 +136,10 @@ function renderExerciseCard(ex, exIdx) {
           <svg viewBox="0 0 24 24" class="icon" style="width:18px;height:18px"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12ZM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4Z"/></svg>
         </button>
       </div>
+      ${ex.targetReps ? `<div class="badge-row" style="margin-top:-4px;margin-bottom:8px;"><span class="badge">Target: ${ex.sets.length}×${escapeHtml(ex.targetReps)}</span></div>` : ''}
       ${prev ? `<div class="settings-item-sub" style="margin-bottom:8px;">Last: ${prev}</div>` : ''}
       <div class="set-grid-header">
-        <span>Set</span><span>${ex.name.match(/run|bike|row|cycl|jump|stair/i) ? 'Minutes' : 'Reps'}</span><span>${units()}</span><span></span>
+        <span>Set</span><span>${isCardio ? 'Minutes' : 'Reps'}</span><span>${units()}</span><span></span>
       </div>
       ${ex.sets.map((s, sIdx) => `
         <div class="set-row">
@@ -315,7 +324,9 @@ function pickExercise(exerciseId) {
     DB.data.activeWorkout.exercises.push({ exerciseId: ex.id, name: ex.name, sets: [{ reps: '', weight: '', completed: false }] });
     DB.save();
   } else if (exercisePickerTarget === 'routineDraft' && routineDraft) {
-    if (!routineDraft.exerciseIds.includes(ex.id)) routineDraft.exerciseIds.push(ex.id);
+    if (!routineDraft.exercises.some(item => item.exerciseId === ex.id)) {
+      routineDraft.exercises.push({ exerciseId: ex.id, sets: 3, reps: '' });
+    }
   }
   closeModal();
   if (exercisePickerTarget === 'routineDraft') openRoutineEditorModal();
@@ -334,7 +345,7 @@ function renderRoutinesView() {
           <div class="list-item">
             <div class="list-item-main">
               <div class="list-item-title">${escapeHtml(r.name)}</div>
-              <div class="list-item-sub">${r.exerciseIds.map(id => { const e = DB.data.exercises.find(x => x.id === id); return e ? e.name : ''; }).filter(Boolean).join(', ')}</div>
+              <div class="list-item-sub">${r.exercises.map(item => { const e = DB.data.exercises.find(x => x.id === item.exerciseId); return e ? e.name : ''; }).filter(Boolean).join(', ')}</div>
             </div>
           </div>
           <div class="fab-row" style="margin:-4px 0 12px;">
@@ -355,7 +366,9 @@ function renderRoutinesView() {
 
 function openRoutineEditor(routineId) {
   const existing = routineId ? DB.data.routines.find(r => r.id === routineId) : null;
-  routineDraft = existing ? { id: existing.id, name: existing.name, exerciseIds: [...existing.exerciseIds] } : { id: null, name: '', exerciseIds: [] };
+  routineDraft = existing
+    ? { id: existing.id, name: existing.name, exercises: existing.exercises.map(e => ({ ...e })) }
+    : { id: null, name: '', exercises: [] };
   openRoutineEditorModal();
 }
 
@@ -369,11 +382,15 @@ function openRoutineEditorModal() {
     </div>
     <div class="form-label">Exercises</div>
     <div class="list" style="margin-bottom:12px;">
-      ${d.exerciseIds.map(id => {
-        const e = DB.data.exercises.find(x => x.id === id);
+      ${d.exercises.map((item, idx) => {
+        const e = DB.data.exercises.find(x => x.id === item.exerciseId);
         return `<div class="list-item">
-          <div class="list-item-title">${e ? escapeHtml(e.name) : 'Unknown'}</div>
-          <button class="list-item-btn" onclick="removeFromRoutineDraft('${id}')">✕</button>
+          <div class="list-item-main">
+            <div class="list-item-title">${e ? escapeHtml(e.name) : 'Unknown'}</div>
+          </div>
+          <input class="form-input" style="width:44px;text-align:center;padding:8px 4px;" type="number" min="1" value="${item.sets}" oninput="routineDraft.exercises[${idx}].sets=parseInt(this.value)||1" aria-label="Sets">
+          <input class="form-input" style="width:64px;text-align:center;padding:8px 4px;" value="${escapeHtml(item.reps)}" placeholder="reps" oninput="routineDraft.exercises[${idx}].reps=this.value" aria-label="Reps">
+          <button class="list-item-btn" onclick="removeFromRoutineDraft(${idx})">✕</button>
         </div>`;
       }).join('') || '<div class="settings-item-sub" style="padding:6px 2px;">No exercises added yet.</div>'}
     </div>
@@ -382,21 +399,21 @@ function openRoutineEditorModal() {
   `);
 }
 
-function removeFromRoutineDraft(id) {
-  routineDraft.exerciseIds = routineDraft.exerciseIds.filter(x => x !== id);
+function removeFromRoutineDraft(idx) {
+  routineDraft.exercises.splice(idx, 1);
   openRoutineEditorModal();
 }
 
 function saveRoutineDraft() {
   const name = ($('#routineNameInput') ? $('#routineNameInput').value : routineDraft.name).trim();
   if (!name) { showToast('Enter a routine name'); return; }
-  if (!routineDraft.exerciseIds.length) { showToast('Add at least one exercise'); return; }
+  if (!routineDraft.exercises.length) { showToast('Add at least one exercise'); return; }
   if (routineDraft.id) {
     const r = DB.data.routines.find(x => x.id === routineDraft.id);
     r.name = name;
-    r.exerciseIds = routineDraft.exerciseIds;
+    r.exercises = routineDraft.exercises;
   } else {
-    DB.data.routines.push({ id: uid(), name, exerciseIds: routineDraft.exerciseIds });
+    DB.data.routines.push({ id: uid(), name, exercises: routineDraft.exercises });
   }
   DB.save();
   routineDraft = null;
