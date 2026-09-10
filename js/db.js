@@ -26,6 +26,7 @@ function defaultDB() {
     exercises: DEFAULT_EXERCISES.map(e => ({ id: uid(), custom: false, ...e })),
     foods: DEFAULT_FOODS.map(f => ({ id: uid(), custom: false, ...f })),
     routines: [],
+    recipes: DEFAULT_RECIPES.map(r => ({ id: uid(), custom: false, ...r })),
     workouts: [],
     activeWorkout: null,
     foodLogs: [],
@@ -51,6 +52,7 @@ const DB = {
     }
     if (!('activeWorkout' in this.data)) this.data.activeWorkout = null;
     if (!this.data.routines) this.data.routines = [];
+    if (!this.data.recipes) this.data.recipes = [];
     if (!this.data.weightLogs) this.data.weightLogs = [];
     if (!this.data.waterLogs) this.data.waterLogs = [];
     this.syncDefaults();
@@ -83,6 +85,14 @@ const DB = {
         changed = true;
       }
     });
+
+    DEFAULT_RECIPES.forEach(def => {
+      if (!this.data.recipes.some(r => r.name === def.name)) {
+        this.data.recipes.push({ id: uid(), custom: false, ...def });
+        changed = true;
+      }
+    });
+
     if (changed) this.save();
   },
   save() {

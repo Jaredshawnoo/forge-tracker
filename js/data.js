@@ -144,3 +144,219 @@ const DEFAULT_ROUTINES = [
     ]
   }
 ];
+
+const DEFAULT_RECIPES = [
+  {
+    name: 'Chicken & Rice Meal Prep Bowls',
+    category: 'Lunch',
+    servings: 4,
+    timeMinutes: 35,
+    ingredients: [
+      '4 boneless chicken breasts (~6 oz each)',
+      '2 cups uncooked white rice',
+      '2 cups broccoli florets',
+      '2 tbsp olive oil',
+      '1 tsp garlic powder',
+      '1 tsp paprika',
+      'Salt & pepper to taste'
+    ],
+    steps: [
+      'Cook rice according to package directions.',
+      'Pat chicken dry, season both sides with garlic powder, paprika, salt, and pepper.',
+      'Heat 1 tbsp olive oil in a pan over medium-high heat; cook chicken 6-7 min per side until internal temp hits 165°F. Rest 5 min, then slice.',
+      'Steam or microwave broccoli with a splash of water for 4-5 min until tender.',
+      'Divide rice, chicken, and broccoli evenly across 4 containers. Drizzle remaining olive oil over each.'
+    ],
+    calories: 520, protein: 45, carbs: 55, fat: 12
+  },
+  {
+    name: 'Turkey Chili',
+    category: 'Dinner',
+    servings: 6,
+    timeMinutes: 45,
+    ingredients: [
+      '2 lb ground turkey (93/7)',
+      '2 cans kidney beans, drained',
+      '1 can (28 oz) diced tomatoes',
+      '1 yellow onion, diced',
+      '2 cloves garlic, minced',
+      '2 tbsp chili powder',
+      '1 tbsp cumin',
+      'Salt & pepper to taste'
+    ],
+    steps: [
+      'Brown turkey in a large pot over medium-high heat, breaking it apart, 6-8 min.',
+      'Add onion and garlic, cook until softened, about 4 min.',
+      'Stir in chili powder and cumin, cook 1 min until fragrant.',
+      'Add beans and diced tomatoes with their juice. Bring to a simmer.',
+      'Simmer uncovered 25-30 min, stirring occasionally, until thickened. Season to taste.'
+    ],
+    calories: 320, protein: 32, carbs: 28, fat: 9
+  },
+  {
+    name: 'Overnight Protein Oats',
+    category: 'Breakfast',
+    servings: 1,
+    timeMinutes: 5,
+    ingredients: [
+      '1/2 cup rolled oats',
+      '1 scoop whey protein powder',
+      '3/4 cup almond milk',
+      '1 tbsp chia seeds',
+      '1/2 banana, sliced'
+    ],
+    steps: [
+      'Combine oats, protein powder, almond milk, and chia seeds in a jar. Stir well.',
+      'Top with sliced banana.',
+      'Cover and refrigerate at least 4 hours or overnight.',
+      'Stir before eating; add a splash of milk if too thick.'
+    ],
+    calories: 380, protein: 30, carbs: 48, fat: 8
+  },
+  {
+    name: 'Egg White & Veggie Muffins',
+    category: 'Breakfast',
+    servings: 6,
+    timeMinutes: 30,
+    ingredients: [
+      '12 egg whites',
+      '4 whole eggs',
+      '1 cup spinach, chopped',
+      '1/2 bell pepper, diced',
+      '1/4 onion, diced',
+      '1/3 cup feta cheese',
+      'Salt & pepper to taste'
+    ],
+    steps: [
+      'Preheat oven to 350°F. Grease a 12-cup muffin tin.',
+      'Whisk egg whites and whole eggs together in a large bowl.',
+      'Stir in spinach, bell pepper, onion, feta, salt, and pepper.',
+      'Pour mixture evenly into muffin cups, about 3/4 full.',
+      'Bake 18-20 min until set and lightly golden. Cool 5 min before removing (2 muffins = 1 serving).'
+    ],
+    calories: 140, protein: 16, carbs: 4, fat: 6
+  },
+  {
+    name: 'Salmon & Sweet Potato Sheet Pan',
+    category: 'Dinner',
+    servings: 4,
+    timeMinutes: 35,
+    ingredients: [
+      '4 salmon fillets (~5 oz each)',
+      '2 medium sweet potatoes, cubed',
+      '1 bunch asparagus, trimmed',
+      '2 tbsp olive oil',
+      '1 lemon, sliced',
+      'Salt & pepper to taste'
+    ],
+    steps: [
+      'Preheat oven to 400°F. Toss sweet potato cubes with 1 tbsp olive oil, salt, and pepper on a sheet pan.',
+      'Roast sweet potatoes 15 min.',
+      'Push potatoes aside, add salmon and asparagus to the pan. Drizzle with remaining oil, top salmon with lemon slices.',
+      'Roast 12-15 min more until salmon flakes easily and potatoes are tender.'
+    ],
+    calories: 430, protein: 34, carbs: 30, fat: 18
+  },
+  {
+    name: 'Greek Yogurt Protein Bowl',
+    category: 'Breakfast',
+    servings: 1,
+    timeMinutes: 5,
+    ingredients: [
+      '1 cup plain Greek yogurt',
+      '1/4 cup granola',
+      '1/2 cup mixed berries',
+      '1 tsp honey'
+    ],
+    steps: [
+      'Spoon yogurt into a bowl.',
+      'Top with granola and mixed berries.',
+      'Drizzle with honey and serve immediately.'
+    ],
+    calories: 310, protein: 24, carbs: 40, fat: 5
+  },
+  {
+    name: 'Beef & Broccoli Stir Fry',
+    category: 'Dinner',
+    servings: 4,
+    timeMinutes: 30,
+    ingredients: [
+      '1.5 lb lean beef strips (sirloin or flank)',
+      '4 cups broccoli florets',
+      '1/3 cup soy sauce (low sodium)',
+      '2 cloves garlic, minced',
+      '1 tsp fresh ginger, minced',
+      '1 tbsp cornstarch',
+      '2 cups cooked rice'
+    ],
+    steps: [
+      'Whisk soy sauce, cornstarch, garlic, and ginger together to make the sauce.',
+      'Sear beef strips in a hot pan/wok 2-3 min until browned. Remove and set aside.',
+      'Stir fry broccoli 3-4 min until bright green and just tender.',
+      'Return beef to the pan, pour in sauce, and toss until glossy and thickened, 1-2 min.',
+      'Serve over cooked rice.'
+    ],
+    calories: 480, protein: 38, carbs: 45, fat: 14
+  },
+  {
+    name: 'Tuna Salad Lettuce Wraps',
+    category: 'Lunch',
+    servings: 2,
+    timeMinutes: 10,
+    ingredients: [
+      '2 cans tuna in water, drained',
+      '1/4 cup plain Greek yogurt',
+      '1 celery stalk, diced',
+      '1 tbsp Dijon mustard',
+      '6-8 large lettuce leaves'
+    ],
+    steps: [
+      'Combine tuna, Greek yogurt, celery, and mustard in a bowl. Mix well.',
+      'Season with salt and pepper to taste.',
+      'Spoon tuna salad into lettuce leaves and wrap to serve.'
+    ],
+    calories: 220, protein: 32, carbs: 6, fat: 6
+  },
+  {
+    name: 'Protein Pancakes',
+    category: 'Breakfast',
+    servings: 1,
+    timeMinutes: 15,
+    ingredients: [
+      '1 scoop whey protein powder',
+      '2 eggs',
+      '1/2 banana',
+      '1/4 cup rolled oats',
+      '1/2 tsp cinnamon'
+    ],
+    steps: [
+      'Blend all ingredients together until smooth.',
+      'Heat a non-stick griddle or pan over medium heat.',
+      'Pour batter into 3 small pancakes, cook 2-3 min per side until golden.',
+      'Serve warm, optionally topped with berries.'
+    ],
+    calories: 340, protein: 32, carbs: 30, fat: 9
+  },
+  {
+    name: 'Shrimp & Quinoa Power Bowl',
+    category: 'Dinner',
+    servings: 4,
+    timeMinutes: 25,
+    ingredients: [
+      '1 lb shrimp, peeled & deveined',
+      '2 cups cooked quinoa',
+      '1 can black beans, drained',
+      '1 cup corn kernels',
+      '1 avocado, sliced',
+      '1 lime, juiced',
+      '1 tbsp olive oil'
+    ],
+    steps: [
+      'Toss shrimp with olive oil, salt, and pepper.',
+      'Sauté shrimp in a hot pan 2 min per side until pink and opaque. Remove from heat.',
+      'Divide quinoa into bowls, top with black beans, corn, shrimp, and avocado.',
+      'Squeeze fresh lime juice over each bowl before serving.'
+    ],
+    calories: 400, protein: 30, carbs: 42, fat: 11
+  }
+];

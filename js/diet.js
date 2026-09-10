@@ -1,6 +1,15 @@
 const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
+const RECIPE_CATEGORIES = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Snack'];
 let dietDate = null;
 let foodPickerMeal = 'Breakfast';
+let dietView = 'log';
+let recipeCategory = 'All';
+let recipeLogMeal = 'Breakfast';
+
+function setDietView(v) {
+  dietView = v;
+  renderApp();
+}
 
 function getDietDate() {
   if (!dietDate) dietDate = todayISO();
@@ -20,6 +29,16 @@ function jumpToToday() {
 }
 
 function renderDiet() {
+  return `
+    <div class="segmented">
+      <button class="${dietView === 'log' ? 'active' : ''}" onclick="setDietView('log')" type="button">Log</button>
+      <button class="${dietView === 'recipes' ? 'active' : ''}" onclick="setDietView('recipes')" type="button">Recipes</button>
+    </div>
+    ${dietView === 'log' ? renderDietLog() : renderRecipesView()}
+  `;
+}
+
+function renderDietLog() {
   const date = getDietDate();
   const goals = DB.data.goals;
   const dayLogs = logsForDate(DB.data.foodLogs, date);
@@ -256,4 +275,203 @@ function saveCustomFood() {
   DB.data.foods.push(f);
   DB.save();
   openFoodQty(f.id);
+}
+
+/* ---------- Recipes ---------- */
+
+function renderRecipesView() {
+  return `
+    <div class="search-box">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5Zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14Z"/></svg>
+      <input id="recipeSearch" class="form-input" placeholder="Search recipes..." oninput="filterRecipeList(this.value)">
+    </div>
+    <div class="chip-row">
+      ${RECIPE_CATEGORIES.map(c => `<button class="chip ${recipeCategory === c ? 'active' : ''}" onclick="setRecipeCategory('${c}')">${c}</button>`).join('')}
+    </div>
+    <div class="list" id="recipeList">
+      ${recipeListRows(DB.data.recipes, '')}
+    </div>
+    <button class="btn btn-ghost btn-block" style="margin-top:12px;" onclick="openCustomRecipeForm()">+ Add Your Own Recipe</button>
+  `;
+}
+
+function recipeListRows(recipes, query) {
+  const q = (query || '').toLowerCase();
+  const list = recipes.filter(r =>
+    (recipeCategory === 'All' || r.category === recipeCategory) &&
+    r.name.toLowerCase().includes(q)
+  );
+  return list.map(r => `
+    <div class="list-item" onclick="openRecipeDetail('${r.id}')" style="cursor:pointer;">
+      <div class="list-item-main">
+        <div class="list-item-title">${escapeHtml(r.name)}</div>
+        <div class="list-item-sub">${r.category} · ${r.calories} kcal/serving · ${r.servings} servings${r.timeMinutes ? ' · ' + r.timeMinutes + ' min' : ''}</div>
+      </div>
+      <svg viewBox="0 0 24 24" class="icon" style="width:18px;height:18px;fill:var(--text-faint);flex:none"><path d="M9 6 8 7l5 5-5 5 1 1 6-6-6-6Z"/></svg>
+    </div>
+  `).join('') || '<div class="empty-state"><p>No recipes found.</p></div>';
+}
+
+function filterRecipeList(value) {
+  $('#recipeList').innerHTML = recipeListRows(DB.data.recipes, value);
+}
+
+function setRecipeCategory(cat) {
+  recipeCategory = cat;
+  renderApp();
+}
+
+function openRecipeDetail(recipeId) {
+  const r = DB.data.recipes.find(x => x.id === recipeId);
+  if (!r) return;
+  openModal(`
+    <div class="modal-title">${escapeHtml(r.name)}</div>
+    <div class="settings-item-sub" style="margin-bottom:12px;">${r.category} · ${r.servings} servings${r.timeMinutes ? ' · ' + r.timeMinutes + ' min' : ''}</div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="macro-row"><span class="macro-label">Per serving</span><span class="food-kcal">${r.calories} kcal</span></div>
+      <div class="badge-row">
+        <span class="badge">P ${round1(r.protein)}g</span>
+        <span class="badge">C ${round1(r.carbs)}g</span>
+        <span class="badge">F ${round1(r.fat)}g</span>
+      </div>
+    </div>
+    <div class="form-label">Ingredients</div>
+    <div class="list" style="margin-bottom:14px;">
+      ${r.ingredients.map(i => `<div class="food-row"><span class="food-name">${escapeHtml(i)}</span></div>`).join('')}
+    </div>
+    <div class="form-label">Steps</div>
+    <div class="list" style="margin-bottom:16px;">
+      ${r.steps.map((s, i) => `<div class="food-row"><span class="food-name">${i + 1}. ${escapeHtml(s)}</span></div>`).join('')}
+    </div>
+    <button class="btn btn-primary btn-block" style="margin-bottom:8px;" onclick="openRecipeLogModal('${r.id}')">Log to Diary</button>
+    ${r.custom ? `<button class="btn btn-danger btn-block" onclick="deleteRecipe('${r.id}')">Delete Recipe</button>` : ''}
+  `);
+}
+
+function openRecipeLogModal(recipeId) {
+  const r = DB.data.recipes.find(x => x.id === recipeId);
+  if (!r) return;
+  recipeLogMeal = MEALS.includes(r.category) ? r.category : 'Breakfast';
+  openModal(`
+    <div class="modal-title">Log ${escapeHtml(r.name)}</div>
+    <div class="form-label">Meal</div>
+    <div class="chip-row" id="recipeMealChips">
+      ${MEALS.map(m => `<button class="chip ${recipeLogMeal === m ? 'active' : ''}" onclick="setRecipeLogMeal('${m}')">${m}</button>`).join('')}
+    </div>
+    <div class="form-group">
+      <label class="form-label">Servings</label>
+      <input id="recipeQtyInput" class="form-input" type="number" inputmode="decimal" step="0.5" value="1" oninput="updateRecipeQtyPreview('${r.id}')">
+    </div>
+    <div class="settings-item-sub" id="recipeQtyPreview" style="margin-bottom:14px;">= ${r.calories} kcal · P${round1(r.protein)} C${round1(r.carbs)} F${round1(r.fat)}</div>
+    <button class="btn btn-primary btn-block" onclick="confirmLogRecipe('${r.id}')">Add to Diary</button>
+  `);
+}
+
+function setRecipeLogMeal(meal) {
+  recipeLogMeal = meal;
+  $('#recipeMealChips').innerHTML = MEALS.map(m => `<button class="chip ${recipeLogMeal === m ? 'active' : ''}" onclick="setRecipeLogMeal('${m}')">${m}</button>`).join('');
+}
+
+function updateRecipeQtyPreview(recipeId) {
+  const r = DB.data.recipes.find(x => x.id === recipeId);
+  const qty = parseFloat($('#recipeQtyInput').value) || 0;
+  $('#recipeQtyPreview').textContent = `= ${Math.round(r.calories * qty)} kcal · P${round1(r.protein * qty)} C${round1(r.carbs * qty)} F${round1(r.fat * qty)}`;
+}
+
+function confirmLogRecipe(recipeId) {
+  const r = DB.data.recipes.find(x => x.id === recipeId);
+  const qty = parseFloat($('#recipeQtyInput').value);
+  if (!qty || qty <= 0) { showToast('Enter a valid amount'); return; }
+  DB.data.foodLogs.push({
+    id: uid(), date: getDietDate(), meal: recipeLogMeal, foodId: null, recipeId: r.id, name: r.name, qty,
+    calories: round1(r.calories * qty), protein: round1(r.protein * qty), carbs: round1(r.carbs * qty), fat: round1(r.fat * qty)
+  });
+  DB.save();
+  closeModal();
+  showToast('Added to ' + recipeLogMeal);
+  dietView = 'log';
+  renderApp();
+}
+
+function openCustomRecipeForm() {
+  openModal(`
+    <div class="modal-title">New Recipe</div>
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input id="crName" class="form-input" placeholder="e.g. Meal Prep Burrito Bowls">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="crCategory" class="form-select">
+          ${RECIPE_CATEGORIES.filter(c => c !== 'All').map(c => `<option value="${c}">${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Servings</label>
+        <input id="crServings" class="form-input" type="number" inputmode="numeric" value="4">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ingredients (one per line)</label>
+      <textarea id="crIngredients" class="form-textarea" placeholder="2 chicken breasts&#10;1 cup rice&#10;..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Steps (one per line)</label>
+      <textarea id="crSteps" class="form-textarea" placeholder="Season and cook chicken...&#10;Cook rice...&#10;..."></textarea>
+    </div>
+    <div class="form-label">Nutrition per serving</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Calories</label>
+        <input id="crCal" class="form-input" type="number" inputmode="decimal" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Protein (g)</label>
+        <input id="crProtein" class="form-input" type="number" inputmode="decimal" placeholder="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Carbs (g)</label>
+        <input id="crCarbs" class="form-input" type="number" inputmode="decimal" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fat (g)</label>
+        <input id="crFat" class="form-input" type="number" inputmode="decimal" placeholder="0">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveCustomRecipe()">Save Recipe</button>
+  `);
+}
+
+function saveCustomRecipe() {
+  const name = $('#crName').value.trim();
+  if (!name) { showToast('Enter a name'); return; }
+  const ingredients = $('#crIngredients').value.split('\n').map(s => s.trim()).filter(Boolean);
+  const steps = $('#crSteps').value.split('\n').map(s => s.trim()).filter(Boolean);
+  const recipe = {
+    id: uid(), custom: true, name,
+    category: $('#crCategory').value,
+    servings: parseInt($('#crServings').value) || 1,
+    timeMinutes: null,
+    ingredients, steps,
+    calories: parseFloat($('#crCal').value) || 0,
+    protein: parseFloat($('#crProtein').value) || 0,
+    carbs: parseFloat($('#crCarbs').value) || 0,
+    fat: parseFloat($('#crFat').value) || 0
+  };
+  DB.data.recipes.push(recipe);
+  DB.save();
+  closeModal();
+  showToast('Recipe saved');
+  renderApp();
+}
+
+function deleteRecipe(id) {
+  if (!confirm('Delete this recipe?')) return;
+  DB.data.recipes = DB.data.recipes.filter(r => r.id !== id);
+  DB.save();
+  closeModal();
+  renderApp();
 }
